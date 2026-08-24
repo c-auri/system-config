@@ -116,19 +116,23 @@ function print_graph_window
         # the same commit as the primary is in view by definition
         [[ "$hash" == "$primary_hash" ]] && continue
 
-        read -r ahead behind < <(git rev-list --left-right --count "$primary...$secondary")
+        # deliberately reversed: --left-right counts the primary-only commits
+        # first, but the indicator names the secondary and so has to read from
+        # its side -- commits only the primary has are ones the secondary is
+        # *behind* by. Swapping here keeps the branches below reading plainly
+        read -r behind ahead < <(git rev-list --left-right --count "$primary...$secondary")
 
         # bold red, matching git log --decorate's color.decorate.remoteBranch default
         ref_display=$'\033[1;31m'"$secondary"$'\033[m'
 
         if (( behind == 0 ))
         then
-            specs+=("$hash" "$ref_display [ahead $ahead]")
+            specs+=("$hash" "$ref_display [$ahead ahead]")
         elif (( ahead == 0 ))
         then
-            specs+=("$hash" "$ref_display [behind $behind]")
+            specs+=("$hash" "$ref_display [$behind behind]")
         else
-            specs+=("$hash" "$ref_display [ahead $ahead, behind $behind]")
+            specs+=("$hash" "$ref_display [$ahead ahead, $behind behind]")
         fi
     done
 

@@ -12,6 +12,13 @@ BEGIN {
         ref_hash[refs] = spec[i]
         ref_msg[refs] = spec[i + 1]
     }
+
+    # font-drawn, so the stem lands on the same pixel column as the graph's own
+    # lane pipes -- box-drawing glyphs are placed by alacritty's builtin renderer
+    # instead and end up a pixel to the left of them
+    arrow_up = "\033[1;90m↑ \033[m"
+    arrow_down = "\033[1;90m↓ \033[m"
+    rail = "\033[1;90m¦\033[m"
 }
 { lines[NR] = $0 }
 index($0, hash) { head_line = NR }
@@ -23,10 +30,19 @@ END {
     # walking line numbers instead of sorting keeps the nearest indicator
     # adjacent to the graph: last above it, first below it
     for (line = 1; line < start; line++)
-        for (i = 1; i <= refs; i++) if (ref_line[i] == line) print "↑ " ref_msg[i]
+        for (i = 1; i <= refs; i++) if (ref_line[i] == line) above[++aboves] = ref_msg[i]
+
+    for (line = end + 1; line <= NR; line++)
+        for (i = 1; i <= refs; i++) if (ref_line[i] == line) below[++belows] = ref_msg[i]
+
+    # collected before anything is printed, because the rail has to go out ahead
+    # of the indicators below the window -- and only when there are any, so a
+    # window that holds every ref still prints the graph and nothing else
+    for (i = 1; i <= aboves; i++) print arrow_up above[i]
+    if (aboves) print rail
 
     for (i = start; i <= end; i++) print lines[i]
 
-    for (line = end + 1; line <= NR; line++)
-        for (i = 1; i <= refs; i++) if (ref_line[i] == line) print "↓ " ref_msg[i]
+    if (belows) print rail
+    for (i = 1; i <= belows; i++) print arrow_down below[i]
 }
