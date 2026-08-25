@@ -28,6 +28,9 @@ Prioritize portability and simplicity over raw performance, scripts should gener
 - Shebang, blank line, then first code
 - Brief comment at top explaining what the script does
 - Allman-style control flow statements: `then`, `do`, etc. on new line, no `;` before the break
+- Allman-style function bodies: opening brace on its own line
+  - Declare with `function name` in bash, and with `name()` in sh-compatible files, since `function` is not POSIX
+  - Trivial definitions may stay on one line, braces included: `cdr() { cd $(git root); }`
 
 **Correct:**
 ```bash
@@ -35,17 +38,25 @@ Prioritize portability and simplicity over raw performance, scripts should gener
 
 # Syncs database snapshots from production to dev
 
+function sync_snapshot
+{
+    echo "Syncing"
+}
+
 if [[ $? -eq 0 ]]
 then
-  echo "Success"
+    sync_snapshot
 fi
 ```
 
 **Incorrect:**
 ```bash
 #!/bin/bash
+function sync_snapshot {
+    echo "Syncing"
+}
 if [[ $? -eq 0 ]]; then
-  echo "Success"
+    sync_snapshot
 fi
 ```
 
@@ -53,7 +64,6 @@ fi
 
 - Fail fast; don't continue after a fatal error
 - No exit code specification yet; add as needed
-
 
 ## Documentation
 
