@@ -1,6 +1,6 @@
-#!/bin/awk -f
+#!/usr/bin/awk -f
 
-# condenses git status output, sourced from `.bashrc`
+# condenses git status output for the prompt in `.bashrc`
 
 BEGIN {
     FS="[ (]"

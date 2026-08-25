@@ -84,7 +84,7 @@ function __prepare_prompt
         dir="\[$(tput setaf 15)\]$dir"
     fi
 
-    git=$(git status 2>/dev/null | shorten-git-status)
+    git=$(git status 2>/dev/null | $HOME/.local/share/bash/shorten-git-status.awk)
     if [[ -n $git ]]
     then
         git="\[$(tput setaf 3)\][$git]"
