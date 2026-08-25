@@ -13,7 +13,7 @@ shopt -s histappend
 HISTCONTROL=ignoreboth
 
 export EDITOR=nvim
-export VISUAL=vim
+export VISUAL=nvim
 
 LESS="-R -i"
 
