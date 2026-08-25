@@ -1,10 +1,11 @@
 # Shell Startup
 
-The shell config is split across three files in the home directory, plus a directory of drop-ins:
+The shell config is split across four files in the home directory, plus a directory of drop-ins:
 ```
 ~
 ├── .bash_profile           # Glue: sources .profile, then .bashrc.
 ├── .bashrc                 # Custom and third-party shell configs.
+├── .inputrc                # Editing mode and key bindings read by all readline programs.
 ├── .profile                # Sets up PATH and env vars and sources drop-ins below.
 └── .profiles/
     ├── local.sh            # Machine-specific env vars, aliases, functions (not committed).

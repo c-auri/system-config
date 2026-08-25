@@ -1,3 +1,6 @@
+# include the distro defaults and overwrite overlaps below
+$include /etc/inputrc
+
 set editing-mode vi
 $if mode=vi
     set keymap vi-command
