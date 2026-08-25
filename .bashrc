@@ -15,7 +15,7 @@ HISTCONTROL=ignoreboth
 export EDITOR=nvim
 export VISUAL=nvim
 
-LESS="-R -i"
+export LESS="-R -i"
 
 eval "$(dircolors $XDG_CONFIG_HOME/.dircolors)"
 export EZA_COLORS="ur=37:uw=37:ue=37:ux=37:gr=37:gw=37:gx=37:tr=37:tw=37:tx=37:sn=2;32:da=2;36:di=1;97:xx=2;37"
