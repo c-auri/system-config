@@ -74,12 +74,17 @@ sudo snap install yq
 - [neovim](https://github.com/neovim/neovim/blob/master/INSTALL.md) and [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim)
 - [eza](https://github.com/eza-community/eza/blob/main/INSTALL.md)
 - [delta](https://dandavison.github.io/delta/installation.html)
-- [bat](https://github.com/sharkdp/bat) (make sure version matches with delta instructions)
 - [nvm](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating) (running the install script should be enough)
 - [fzf](https://github.com/junegunn/fzf?tab=readme-ov-file#using-git)
 - [vivify](https://github.com/jannis-baum/vivify)
 - [ImageMagick](https://imagemagick.org/script/download.php#gsc.tab=0) (make AppImage executable and put in a place that is added to PATH)
-- [xidlehook](https://github.com/jD91mZM2/xidlehook)
+- [rustup](https://rustup.rs/), which provides the `cargo` used below and puts it in `~/.cargo/bin`
+
+### Cargo
+```bash
+cargo install bat xidlehook
+bat cache --build
+```
 
 ## Customization
 ### GUI
