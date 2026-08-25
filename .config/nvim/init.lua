@@ -123,16 +123,36 @@ require('lazy').setup {
 
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
+      local global_ignore_file = (vim.env.XDG_CONFIG_HOME or vim.fn.expand '~/.config') .. '/fd/ignore'
+
       require('telescope').setup {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
-        --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
-        -- pickers = {}
+        defaults = {
+          -- mappings = {
+          --   i = { ['<c-enter>'] = 'to_fuzzy_refine' },
+          -- },
+
+          -- Search gitignored files too, and let fd's global ignore file decide what
+          -- counts as noise. fd reads that file on its own, ripgrep has to be told.
+          vimgrep_arguments = {
+            'rg',
+            '--color=never',
+            '--no-heading',
+            '--with-filename',
+            '--line-number',
+            '--column',
+            '--smart-case',
+            '--hidden',
+            '--no-ignore-vcs',
+            '--ignore-file=' .. global_ignore_file,
+          },
+        },
+        pickers = {
+          find_files = {
+            find_command = { 'fd', '--type', 'f', '--color', 'never', '--hidden', '--no-ignore-vcs' },
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),

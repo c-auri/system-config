@@ -2,4 +2,6 @@
 
 # Fuzzy-searches files and opens the selected one in nvim
 
-fd --type f -H . | fzf --bind "enter:become(nvim {})" --preview "bat --color always {} --style header,grid"
+fd --type f -H --no-ignore-vcs . | fzf \
+    --bind "enter:become(nvim {})" \
+    --preview "bat --color always {} --style header,grid"

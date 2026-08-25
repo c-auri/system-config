@@ -1,0 +1,23 @@
+# Read by fd directly, and by ripgrep and lt through .config/nvim/init.lua and
+# .bashrc. Those two only understand slash-free name patterns.
+
+.git/
+node_modules/
+.venv/
+__pycache__/
+.cache/
+
+# build output
+dist/
+target/
+.astro/
+.next/
+obj/
+bin/Debug/
+bin/Release/
+
+# lockfiles
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+Cargo.lock

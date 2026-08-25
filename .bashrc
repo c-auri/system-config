@@ -136,7 +136,26 @@ alias ls='eza --group-directories-first'
 alias la='ls -a'
 alias ll='ls -l --git --no-user'
 alias lla='ll -a'
-alias lt='ls --tree --git-ignore'
+
+function lt
+{
+    local ignore_files=()
+    local git_root=$(git-root 2>/dev/null)
+
+    [[ -f $XDG_CONFIG_HOME/fd/ignore ]]        && ignore_files+=("$XDG_CONFIG_HOME/fd/ignore")
+    [[ -n $git_root && -f $git_root/.ignore ]] && ignore_files+=("$git_root/.ignore")
+    [[ -f .ignore && $PWD != $git_root ]]      && ignore_files+=(.ignore)
+
+    local ignore_glob=""
+
+    if [[ ${#ignore_files[@]} -gt 0 ]]
+    then
+        # eza matches globs against names rather than paths, so patterns with a slash in them are ignored
+        ignore_glob=$(sed 's/[[:space:]]*#.*//; s:/$::; /^$/d; /\//d' "${ignore_files[@]}" | paste -sd '|' -)
+    fi
+
+    ls --tree -I "$ignore_glob" "$@"
+}
 
 alias mkdir='mkdir -p'
 alias mv='mv -i'
