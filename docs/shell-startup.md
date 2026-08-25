@@ -44,7 +44,9 @@ Bash does none of this on its own. Sourcing one startup file from another is a c
 
 `.bashrc` holds everything that only matters in an interactive shell: aliases, functions, the prompt, completions, and third-party integrations such as fzf, nvm, and cargo.
 
-Bash reads it directly only for a non-login interactive shell. Login shells reach it through `.bash_profile`, which is what makes both paths equivalent.
+Bash reads it directly only for a non-login interactive shell. Login shells reach it through `.bash_profile`, which is what makes both paths equivalent. 
+
+But Bash also sources it for non-interactive shells started by a remote shell daemon, which covers `ssh host command` and the shells behind `scp` and `rsync`. Those transfers break on any output, so the file returns immediately when `$-` shows the shell is not interactive.
 
 ## .profile
 

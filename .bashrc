@@ -1,6 +1,9 @@
 # Aliases, functions, prompt, completions, shell options, third-party configs.
 # See ~/docs/shell-startup.md for context.
 
+# return early if shell is non-interactive
+[[ $- != *i* ]] && return
+
 ################################################################################
 ################################### CORE #######################################
 ################################################################################
