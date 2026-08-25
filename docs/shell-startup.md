@@ -5,8 +5,7 @@ The shell config is split across three files in the home directory, plus a direc
 ~
 ├── .bash_profile           # Glue: sources .profile, then .bashrc.
 ├── .bashrc                 # Custom and third-party shell configs.
-├── .profile                # PATH, env vars. Set once, inherited, sh-compatible.
-│                           # Also sources every drop-in below:
+├── .profile                # Sets up PATH and env vars and sources drop-ins below.
 └── .profiles/
     ├── local.sh            # Machine-specific env vars, aliases, functions (not committed).
     ├── secrets.sh          # Exported secrets (not committed).
@@ -16,27 +15,55 @@ The shell config is split across three files in the home directory, plus a direc
 ```
 Bash picks which of these it reads based on how the shell was started:
 
-| | Login (SSH, TTY, `bash --login`) | Non-login (new terminal tab) |
+| | Login | Non-login |
 |---|---|---|
 | **Interactive** | profile chain | `.bashrc` |
 | **Non-interactive** | profile chain | `$BASH_ENV` (almost never set) |
 
 **Profile chain** means `.bash_profile`, `.bash_login`, `.profile`, in that order. Bash reads only the **first** of these that exists and ignores the rest.
 
-This means bash never reads `.bashrc` directly for a login shell, interactive or not. Logging in over SSH would therefore give you the environment from the profile chain but none of the interactive shell config: no aliases, no prompt, no completions.
+Both interactive cases occur in normal use:
 
-`.bash_profile` is the glue that fixes exactly that. It sits first in the chain, so it is the file a login shell picks, and it then sources `.profile` and `.bashrc` explicitly:
+- **Login** applies to every tmux pane, because tmux starts its pane shells as login shells, and to SSH and TTY logins.
+- **Non-login** applies to a terminal started directly, for example by picking alacritty from the app launcher, because alacritty spawns bash without making it a login shell. Such a shell reads `.bashrc` only. It still has the full environment, inherited from the graphical session rather than sourced.
+
+Bash never reads `.bashrc` for a login shell, interactive or not. Without further wiring, an SSH login would supply the environment from the profile chain but none of the interactive configuration: no aliases, no prompt, no completions.
+
+## .bash_profile
+
+`.bash_profile` provides that wiring. It sits first in the chain, so it is the file a login shell picks, and it sources `.profile` and `.bashrc` explicitly:
 ```bash
 [ -f "$HOME/.profile" ] && . "$HOME/.profile"
 [[ -n "$PS1" && -f "$HOME/.bashrc" ]] && . "$HOME/.bashrc"
 ```
-The `$PS1` guard keeps the non-interactive login case free of interactive config, but loads it for interactive login shells.
+The `$PS1` guard keeps interactive configuration out of non-interactive login shells while still loading it for interactive ones.
 
-Nothing in bash does any of this. Sourcing one startup file from another is a convention every setup implements by hand, and it could be done in `.profile` instead. The reason for keeping a separate `.bash_profile` is that its slot is contested. Installers (rustup, nvm, conda) routinely append their `export PATH=...` to `~/.bash_profile` and create it if absent, and that new file would then win the chain and silently shadow `.profile` and every drop-in with it. Owning the slot means those installers only ever append to a file that already sources everything else.
+Bash does none of this on its own. Sourcing one startup file from another is a convention each setup implements by hand, and it could be done from `.profile` instead. A separate `.bash_profile` exists because installers such as rustup, nvm, and conda append their `export PATH=...` to `~/.bash_profile`, creating the file if it does not exist. A file created that way would take precedence in the profile chain and shadow `.profile` along with every drop-in. Keeping `.bash_profile` in place means such appends land in a file that already sources the rest.
+
+## .bashrc
+
+`.bashrc` holds everything that only matters in an interactive shell: aliases, functions, the prompt, completions, and third-party integrations such as fzf, nvm, and cargo.
+
+Bash reads it directly only for a non-login interactive shell. Login shells reach it through `.bash_profile`, which is what makes both paths equivalent.
+
+## .profile
+
+Two independent actors source `.profile`:
+
+- **GDM, once per graphical session.** The display manager runs `/etc/gdm3/Xsession`, which sources `/etc/profile` and then `~/.profile` before launching awesome. The graphical session is not started by a shell, so this pass is the only source of environment for awesome and for everything started from it, including rofi, dunst, and terminals opened from the app launcher.
+- **Every login shell, once each.** `.bash_profile` sources it explicitly, which covers tmux panes, SSH sessions, and TTY logins.
+
+A tmux pane therefore runs the file twice, once for the session and once for the pane's login shell, and each further nested login shell adds another pass.
+
+Two constraints follow:
+
+- **Keep it sh-compatible.** The GDM pass runs the file from a POSIX shell script rather than from bash.
+- **Keep it idempotent.** Any statement that mutates a variable instead of assigning it runs once per pass. An unguarded `PATH="$new:$PATH"` accumulates a duplicate entry per pass, compounding with each nested login shell.
 
 ## Drop-ins
 
-`.profile` sources every `*.sh` in `.profiles/` instead of naming the files individually, so a drop-in is added by creating a file and removed by deleting it. The glob expands in alphabetical order, and it is not recursive, so the contents of `.templates/` are never sourced.
+`.profile` sources every `*.sh` in `.profiles/` instead of naming the files individually, so a drop-in is added by creating a file and removed by deleting it. The glob is not recursive, and it does not match dotfiles, so the contents of `.templates/` are never sourced.
+
+Load order matters, because other drop-ins read values that `local.sh` sets, such as `PROJECTS_DIR`. `.profile` therefore sources `local.sh` by name before the loop, and skips it inside.
 
 `local.sh` and `secrets.sh` are never committed, but the repository tracks templates that are meant to be copied over and filled out on a fresh machine. This means the list of variables that are expected to be defined stays under version control even though the values never are.
-
