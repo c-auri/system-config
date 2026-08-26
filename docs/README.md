@@ -43,7 +43,7 @@ Documentation about the configs themselves can be found:
        email = <git-user-email>
     ```
 
-1. Copy the local profile from the template and fill in the values: 
+1. Copy the local profile from the template and fill in the values:
     ```bash
    cp ~/.profiles/.templates/local.sh ~/.profiles/local.sh
     ```
