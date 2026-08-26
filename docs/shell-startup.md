@@ -9,10 +9,8 @@ The shell config is split across four files in the home directory, plus a direct
 ├── .profile                # Sets up PATH and env vars and sources drop-ins below.
 └── .profiles/
     ├── local.sh            # Machine-specific env vars, aliases, functions (not committed).
-    ├── secrets.sh          # Exported secrets (not committed).
-    └── .templates/         # Expected shape of the uncommitted files. Copy out and fill in.
-        ├── local.sh
-        └── secrets.sh
+    └── .templates/
+        └── local.sh        # Expected shape of local.sh, copy out and fill in.
 ```
 Bash picks which of these it reads based on how the shell was started:
 
@@ -65,8 +63,8 @@ Two constraints follow:
 
 ## Drop-ins
 
-`.profile` sources every `*.sh` in `.profiles/` instead of naming the files individually, so a drop-in is added by creating a file and removed by deleting it. The glob is not recursive, and it does not match dotfiles, so the contents of `.templates/` are never sourced.
+`.profile` sources every `*.sh` in `.profiles/` instead of naming the files individually, so a drop-in is added by creating a file and removed by deleting it. This means any context that needs its own file can have one, for example a `secrets.sh` exporting API tokens. `.gitignore` matches `.profiles/*.sh`, which means a new drop-in stays uncommitted without further setup.
 
 Load order matters, because other drop-ins read values that `local.sh` sets, such as `PROJECTS_DIR`. `.profile` therefore sources `local.sh` by name before the loop, and skips it inside.
 
-`local.sh` and `secrets.sh` are never committed, but the repository tracks templates that are meant to be copied over and filled out on a fresh machine. This means the list of variables that are expected to be defined stays under version control even though the values never are.
+`local.sh` is never committed, but the repository tracks a template that is meant to be copied over and filled out on a fresh machine. This means the list of variables that are expected to be defined stays under version control even though the values never are.

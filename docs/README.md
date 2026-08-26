@@ -43,12 +43,10 @@ Documentation about the configs themselves can be found:
        email = <git-user-email>
     ```
 
-1. Create the drop-in profiles from their templates and fill in your values:
+1. Copy the local profile from the template and fill in the values: 
     ```bash
    cp ~/.profiles/.templates/local.sh ~/.profiles/local.sh
-   cp ~/.profiles/.templates/secrets.sh ~/.profiles/secrets.sh
     ```
-    (Both these files are gitignored)
 
 1. Restart terminal
 
