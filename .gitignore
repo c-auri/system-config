@@ -1,6 +1,5 @@
 # Applies to both dotfiles repos, since both use $HOME as their work tree.
 
-# Profile drop-ins are machine-local by default, so that a stray `add -A`
-# cannot commit secrets. Context drop-ins that belong in a repo opt in below.
+# Profile drop-ins are machine-local by default,
+# so that a stray `add -A` cannot commit secrets.
 .profiles/*.sh
-!.profiles/work.sh
