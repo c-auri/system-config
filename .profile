@@ -15,6 +15,11 @@ prepend_path()
     esac
 }
 
+# Go tools bin is created on first `go install`, so guard on Go itself.
+if [ -d "/usr/local/go/bin" ]; then
+    prepend_path "/usr/local/go/bin"
+    prepend_path "$HOME/go/bin"
+fi
 [ -d "$HOME/.cargo/bin" ] && prepend_path "$HOME/.cargo/bin"
 [ -d "$HOME/bin" ] && prepend_path "$HOME/bin"
 [ -d "$HOME/.local/bin" ] && prepend_path "$HOME/.local/bin"

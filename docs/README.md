@@ -57,7 +57,7 @@ sudo apt install \
     awesome xterm \
     rofi dunst xdotool xsecurelock \
     arandr lxappearance lxsession lxpolkit \
-    fd-find ripgrep tmux xclip jq \
+    fd-find ripgrep tmux xclip jq make \
     gimp feh flameshot mpv vlc
 ```
 ```bash
@@ -77,6 +77,8 @@ sudo snap install yq
 - [vivify](https://github.com/jannis-baum/vivify)
 - [ImageMagick](https://imagemagick.org/script/download.php#gsc.tab=0) (make AppImage executable and put in a place that is added to PATH)
 - [rustup](https://rustup.rs/), which provides the `cargo` used below and puts it in `~/.cargo/bin`
+- [Go](https://go.dev/doc/install) (only extract the archive to `/usr/local/go`, since `.profile` already adds `/usr/local/go/bin` and `~/go/bin` to PATH)
+- [gh](https://github.com/cli/cli/blob/trunk/docs/install_linux.md#debian), installed through the official apt repository, so `apt upgrade` keeps it current
 
 ### Cargo
 ```bash
