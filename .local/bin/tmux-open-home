@@ -1,10 +1,71 @@
 #!/bin/sh
+
+# Shows the home session: from Ctrl+Super+T in a new terminal, and from tmux bindings and
+# hooks. Shows home itself when no client shows it, and otherwise a new grouped view of it,
+# so each terminal can show its own window. Views get destroy-unattached, so they close
+# when their terminal closes or switches away, instead of piling up.
+#
+# Inside tmux it switches a client instead of attaching the terminal. Bindings and hooks
+# pass the client as the first argument, since a command started by run-shell can't tell
+# which client triggered it.
 SESSION="home"
+CLIENT="$1"
+
+# Switches the client to the session given as $1, followed by the tmux commands in the
+# further arguments
+switch_client()
+{
+    target="$1"
+    shift
+    if [ -n "$CLIENT" ]
+    then
+        tmux switch-client -c "$CLIENT" -t "$target" "$@"
+    else
+        tmux switch-client -t "$target" "$@"
+    fi
+}
+
+# Prints the format given as $1 for the client. tmux 3.2a rejects display-message -c and
+# has no list-clients -f, so every client prints a line, empty for all but this one.
+client_format()
+{
+    if [ -n "$CLIENT" ]
+    then
+        tmux list-clients -F "#{?#{==:#{client_name},$CLIENT},$1,}" | grep .
+    else
+        tmux display-message -p "$1"
+    fi
+}
+
+# Shows the session given as $1, followed by the tmux commands in the further arguments
+show()
+{
+    if [ -z "$TMUX" ]
+    then
+        target="$1"
+        shift
+        exec tmux attach-session -t "$target" "$@"
+    else
+        switch_client "$@"
+    fi
+}
 
 # "=" makes tmux match the exact name instead of falling back to a prefix match
-if tmux has-session -t "=$SESSION" 2>/dev/null
+if ! tmux has-session -t "=$SESSION" 2>/dev/null
 then
-    exec tmux new-session -t "=$SESSION"
+    tmux new-session -d -s "$SESSION" -c "$HOME"
+    show "=$SESSION"
+elif [ "$(tmux list-sessions -f "#{==:#{session_name},$SESSION}" -F '#{session_attached}')" -eq 0 ]
+then
+    show "=$SESSION"
 else
-    exec tmux new-session -s "$SESSION"
+    view=$(tmux new-session -d -t "=$SESSION" -P -F '#{session_id}')
+    if [ -n "$TMUX" ] && [ "$(client_format '#{client_session}')" = "$SESSION" ]
+    then
+        # The client switched to home itself and the hook called this. Going through its
+        # last session first keeps that session the one prefix + H and prefix + L return to.
+        switch_client "=$(client_format '#{client_last_session}')" 2>/dev/null
+    fi
+    # only once the view is shown: a detached session with the option is removed at once
+    show "$view" \; set-option -t "$view" destroy-unattached on
 fi
