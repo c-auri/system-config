@@ -235,7 +235,7 @@ local globalkeys = gears.table.join(
 		awful.spawn.with_shell("rofi-launcher")
 	end, { description = "application launcher", group = "awesome: applications" }),
 	awful.key({ meta, ctrl }, "t", function()
-		awful.spawn(terminal .. " -e tmux-open-scratch")
+		awful.spawn(terminal .. " -e tmux-open-home")
 	end, { description = "open terminal with tmux", group = "awesome: applications" }),
 	awful.key({ meta, ctrl }, "f", function()
 		awful.spawn("pcmanfm")

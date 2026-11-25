@@ -1,0 +1,10 @@
+#!/bin/sh
+SESSION="home"
+
+# "=" makes tmux match the exact name instead of falling back to a prefix match
+if tmux has-session -t "=$SESSION" 2>/dev/null
+then
+    exec tmux new-session -t "=$SESSION"
+else
+    exec tmux new-session -s "$SESSION"
+fi
